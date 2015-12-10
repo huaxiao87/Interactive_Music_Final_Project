@@ -39,9 +39,9 @@ function list()
 			}
 			else
 			{
-			//	sendRelativePosition( currentPoint[0],currentPoint[1] );
-			//	lastPoint[0] 	= currentPoint[0];
-			//	lastPoint[1] 	= currentPoint[1];
+				sendRelativePosition( currentPoint[0],currentPoint[1] );
+				lastPoint[0] 	= currentPoint[0];
+				lastPoint[1] 	= currentPoint[1];
 			}
 			
 		}
