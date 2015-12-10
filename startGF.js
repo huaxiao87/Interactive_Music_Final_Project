@@ -1,10 +1,10 @@
 inlets	=3;
-outlets	=3;
+outlets	=6;
 
-var currentPoint		= new Array(2);
-var lastPoint			= new Array(2);//for calculating the speed
-var startPoint			= new Array(2);//for calculating the relative position
-var relativePosition	= new Array(2);
+var currentPoint		= [ 0,0 ];
+var lastPoint			= [ 0,0 ];//for calculating the speed
+var startPoint			= [ 0,0 ];//for calculating the relative position
+var relativePosition	= [ 0,0 ];
 
 
 var isSending 			= 0;
@@ -12,35 +12,47 @@ var distanceThreshold	= 20;
 
 function list()
 {
-	if ( input==0 )
+	if ( inlet==0 && arguments.length==2)
 	{
 		currentPoint[0]		= arguments[0];
 		currentPoint[1] 	= arguments[1];
+		outlet(4,currentPoint);
+		outlet(3,lastPoint);
 	
 		//check the distance between current list and last list
-		distance 	= norm(x - lastPoint[0], y - lastPoint[1]);
+		distance 	= norm(currentPoint[0] - lastPoint[0], currentPoint[1] - lastPoint[1]);
 		
 		if (distance > distanceThreshold )
 		{
-			if ( isSending == 0 )
+			if ( isSending == 0 )//not sending?
 			{
-				isSending 	= 1;
-				startPoint	= currentPoint;
-				outlet(2,1);
+				isSending 	= 1; //send data
 				
+				startPoint	= currentPoint;// let current point be the start point
+				outlet(2,1);//start gesture following
 				startTiming();//after a period, stop sending messages
-				sendRelativePosition( x,y );
-				lastPoint
+				sendRelativePosition( currentPoint[0],currentPoint[1] );
+				lastPoint[0] 	= currentPoint[0];
+				lastPoint[1] 	= currentPoint[1];
+				
+				
 			}
 			else
 			{
-				sendRelativePosition( x,y );
+			//	sendRelativePosition( currentPoint[0],currentPoint[1] );
+			//	lastPoint[0] 	= currentPoint[0];
+			//	lastPoint[1] 	= currentPoint[1];
 			}
+			
 		}
 		else 
 		{
-			isSending == 1;
-			sendRelativePosition( x,y );
+			if ( isSending == 1 )
+			{
+				sendRelativePosition( currentPoint[0],currentPoint[1] );
+				lastPoint[0] 	= currentPoint[0];
+				lastPoint[1] 	= currentPoint[1];
+			}
 		}
 	}
 }
@@ -51,9 +63,9 @@ function norm( x, y ){
 }
 
 function sendRelativePosition( x,y ){
-	position[0] 	= x-startPoint[0];
-	position[1] 	= y-startPoint[1];
-	outlet(0,position);
+	relativePosition[0] 	= x - startPoint[0];
+	relativePosition[1] 	= y - startPoint[1];
+	outlet(0,relativePosition);
 }
 
 function startTiming()
@@ -63,9 +75,19 @@ function startTiming()
 
 function msg_int()
 {
-	if ( input==1 && arguments[0]==0 )
+	if ( inlet==1 && arguments[0]==0 )
 	{
 		isSending = 0;
+		initialize();
 		outlet(2,0);
 	}
+}
+
+function initialize()
+{
+	currentPoint		= [ 0,0 ];
+	lastPoint			= [ 0,0 ];//for calculating the speed
+	startPoint			= [ 0,0 ];//for calculating the relative position
+	relativePosition	= [ 0,0 ];
+	isSending 			= 0;
 }
